@@ -1,9 +1,7 @@
-//
 // boltdbweb is a webserver base GUI for interacting with BoltDB databases.
 //
 // For authorship see https://github.com/evnix/boltdbweb
 // MIT license is included in repository
-//
 package main
 
 //go:generate go-bindata-assetfs -o web_static.go web/...
@@ -11,15 +9,14 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"net/http"
 	"os"
 	"path"
-	"time"
 
-	"github.com/evnix/boltdbweb/web"
-	"github.com/gin-gonic/gin"
-
-	log "github.com/sirupsen/logrus"
 	"github.com/boltdb/bolt"
+	log "github.com/sirupsen/logrus"
 )
 
 const version = "v0.0.0"
@@ -54,64 +51,45 @@ func init() {
 	// Setup for command line processing
 	flag.BoolVar(&showHelp, "h", false, "display help")
 	flag.BoolVar(&showHelp, "help", false, "display help")
-	flag.StringVar(&dbName, "d", dbName, "Name of the database")
-	flag.StringVar(&dbName, "db-name", dbName, "Name of the database")
-	flag.StringVar(&port, "p", port, "Port for the web-ui")
-	flag.StringVar(&port, "port", port, "Port for the web-ui")
+}
+
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
+
+	r.Use(static.Serve("/", static.LocalFile("./www/build", false)))
+	r.GET("/buckets", Buckets)
+	r.GET("/database", Databases)
+	r.POST("/createBucket", CreateBucket)
+	r.POST("/put", Put)
+	r.POST("/get", Get)
+	r.POST("/delete-key", DeleteKey)
+	r.POST("/delete-bucket", DeleteBucket)
+	r.POST("/get-bucket-data", PrefixScan)
+	r.POST("/load-database", LoadDatabase)
+
+	return r
 }
 
 func main() {
 	appName := path.Base(os.Args[0])
 	flag.Parse()
-	args := flag.Args()
 
 	if showHelp == true {
 		usage(appName, version)
 		os.Exit(0)
 	}
 
-	// If non-flag options are included assume bolt db is specified.
-	if len(args) > 0 {
-		dbName = args[0]
-	}
-
-	if dbName == "" {
-		usage(appName, version)
-		log.Printf("\nERROR: Missing boltdb name\n")
-		os.Exit(1)
-	}
-
-	fmt.Print(" ")
 	log.Info("starting boltdb-browser..")
 
-	var err error
-	db, err = bolt.Open(dbName, 0600, &bolt.Options{Timeout: 2 * time.Second})
-	boltbrowserweb.Db = db
+	r := setupRouter()
 
+	err := r.Run(":" + port)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Errorf("could not start gin. error: %s", err.Error())
+		return
 	}
-
-	// OK, we should be ready to define/run web server safely.
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
-
-	r.GET("/", boltbrowserweb.Index)
-
-	r.GET("/buckets", boltbrowserweb.Buckets)
-	r.POST("/createBucket", boltbrowserweb.CreateBucket)
-	r.POST("/put", boltbrowserweb.Put)
-	r.POST("/get", boltbrowserweb.Get)
-	r.POST("/deleteKey", boltbrowserweb.DeleteKey)
-	r.POST("/deleteBucket", boltbrowserweb.DeleteBucket)
-	r.POST("/prefixScan", boltbrowserweb.PrefixScan)
-
-	r.StaticFS("/web", assetFS())
-
-	r.Run(":" + port)
 }
