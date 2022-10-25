@@ -6,7 +6,8 @@ import {
     EditOutlined,
     FileAddOutlined,
     PlusCircleOutlined,
-    SaveOutlined
+    SaveOutlined,
+    ReloadOutlined
 } from '@ant-design/icons';
 import {
     Button,
@@ -416,13 +417,25 @@ class App extends React.Component {
                 <Spin spinning={this.state.loaderDB} tip="Loading bolt databases...">
                     <Layout>
                         <Sider width={350} className="site-layout-background">
-                            <Select
-                                options={this.state.dbs}
-                                placeholder="Select database"
-                                style={{width: '100%'}}
-                                value={this.state.selectedDatabase}
-                                onChange={(val) => this.loadDB(val)}
-                            />
+                            <Row>
+                                <Col span="21">
+                                    <Select
+                                        options={this.state.dbs}
+                                        placeholder="Select database"
+                                        style={{width: '100%'}}
+                                        value={this.state.selectedDatabase}
+                                        onChange={(val) => this.loadDB(val)}
+                                    />
+                                </Col>
+                                <Col span="3">
+                                    <Button
+                                        type="primary"
+                                        icon={<ReloadOutlined />}
+                                        style={{width: '100%'}}
+                                        onClick={() => this.loadDatabases()}
+                                    />
+                                </Col>
+                            </Row>
                             <Menu
                                 mode="inline"
                                 selectedKeys={[this.state.selectedBucket.key]}
