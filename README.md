@@ -1,32 +1,30 @@
-# boltdbweb
-A simple web based boltdb GUI Admin panel.
+# boltdbmyadmin
+A simple SPA BoltDB GUI Admin panel with docker, JSON highlight syntax and unlimited boltdb database files. Based on [boltdbweb](github.com/evnix/boltdbweb). 
 
+UI framework - [AntDesign](https://github.com/ant-design/ant-design/).
 
-##### Installation
-```
-go get github.com/evnix/boltdbweb
-```
+JSON highlight syntax - [JSON tree viewer](https://www.npmjs.com/package/react-json-tree)
 
 ##### Usage
 ```
-boltdbweb --db-name=<DBfilename>[required] --port=<port>[optional] --static-path=<static-path>[optional]
+docker run -p 8080:8080 -v [absolute path to directory with *.db files]:/app/boltdbs -d kolyuchy/boltdbmyadmin
 ```
-- `--db-name:` The file name of the DB.
-    - NOTE: If 'file.db' does not exist. it will be created as a BoltDB file.
-- `--port:` Port for listening on... (Default: 8080)
-- `--static-path:` If you moved the binary to different folder you can determin the path of the `web` folder. (Default: Same folder where the binary is located.)
+- `absolute path to directory with *.db files` - directory can be include subdirectory. All *.db files copied to `/app` 
+in container will be loaded to UI
 
-
-##### Example
+##### docker-compose example
 ```
-boltdbweb --db-name=test.db --port=8089 --static-path=/home/user/github/boltdbweb
+services:
+  web:
+    build: kolyuchy/boltdbmyadmin:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
 ```
-Goto: http://localhost:8089
 
 ##### Screenshots:
 
-![](https://github.com/evnix/boltdbweb/blob/master/screenshots/1.png?raw=true)
+![](https://github.com/kolyuchy/boltdbmyadmin/blob/master/screenshots/1.png?raw=true)
 
-![](https://github.com/evnix/boltdbweb/blob/master/screenshots/2.png?raw=true)
-
-![](https://github.com/evnix/boltdbweb/blob/master/screenshots/3.png?raw=true)
+![](https://github.com/kolyuchy/boltdbmyadmin/blob/master/screenshots/2.png?raw=true)
