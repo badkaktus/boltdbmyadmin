@@ -25,6 +25,6 @@ services:
 
 ##### Screenshots:
 
-![](https://github.com/kolyuchy/boltdbmyadmin/blob/master/screenshots/1.png?raw=true)
+![](https://raw.githubusercontent.com/badkaktus/boltdbmyadmin/master/screenshots/1.png?raw=true)
 
-![](https://github.com/kolyuchy/boltdbmyadmin/blob/master/screenshots/2.png?raw=true)
+![](https://raw.githubusercontent.com/badkaktus/boltdbmyadmin/master/screenshots/2.png?raw=true)
